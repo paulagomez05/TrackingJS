@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="js/map.js"></script>
+  <title>Ubicación de rutas Bogotá</title>
+
+  <style>
+    html,
+    body,
+    #viewDiv {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      width: 100%;
+    }
+  </style>
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.22/esri/themes/light/main.css" />
+  <script src="https://js.arcgis.com/4.22/"></script>
+
+  <script>
+    require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/widgets/Directions",
+      "esri/layers/FeatureLayer",
+      "esri/config",
+      "esri/widgets/Track",
+      "esri/widgets/Locate",
+      "esri/Graphic",
+      "esri/widgets/Expand",
+      "esri/views/SceneView"
+    ], function (Map, MapView, Directions, FeatureLayer, esriConfig, Track, Locate, Graphic, Expand, SceneView) {
+      // An authorization string used to access the basemap, geocoding and routing services
+      esriConfig.apiKey = "AAPKe7259512bb5c4d73adad66992ec1b38eYFod1NNVS4uAYdf1dSTL6xwHlnEjSQZVtRUjUo6BEEdA-XKSDFMELq-IqMZvrjt_";
+
+      //Tipo de mapa
+      const map = new Map({
+          ground: "world-elevation",
+          basemap: "arcgis-navigation"
+        });
+
+      //Ubicación de mapa
+        const view = new SceneView({
+          container: "viewDiv",
+          map: map,
+          qualityProfile: "high",
+          camera: {
+            position: [
+              -118.80714018,
+              33.96144206,
+              1574.65501
+            ],
+            heading: 0.51,
+            tilt: 78.99
+          }
+        });
+
+      const locate = new Locate({
+        view: view,
+        useHeadingEnabled: false,
+        goToOverride: function (view, options) {
+          options.target.scale = 1500;
+          return view.goTo(options.target);
+        }
+      });
+      view.ui.add(locate, "top-right");
+
+      const track = new Track({
+        view: view,
+        graphic: new Graphic({
+          symbol: {
+            type: "simple-marker",
+            size: "12px",
+            color: "red",
+            outline: {
+              color: "#efefef",
+              width: "1.5px"
+            }
+          }
+        }),
+        useHeadingEnabled: true
+      });
+      view.ui.add(track, "top-right");
+
+      // The sample will start tracking your location
+      // once the view becomes ready
+      view.when(function () {
+        track.start();
+      });
+
+      const direccion = new Expand({
+        content: new Directions({
+          view: view,
+          style: "card" // other styles include 'classic'
+        }),
+        view: view,
+        expanded: true
+      });
+      view.ui.add(direccion, "top-left");
+
+      var layer = new FeatureLayer({
+        url: "https://services2.arcgis.com/NEwhEo9GGSHXcRXV/ArcGIS/rest/services/Cicloparqueaderos_Certificados_Bogota_D_C/FeatureServer/0",
+        popupTemplate: createPopupTemplate(),     
+      });
+
+      map.add(layer);
+
+
+      function createPopupTemplate() {
+        return {
+          title: "{Cicloparqueo}",
+          content: [
+            {
+              type: "fields",
+              fieldInfos: [
+                {
+                  fieldName: "NOMBRE_CICP",
+                  label: "Nombre Cicloparqueadero",
+                  format: {
+                    places: 0,
+                    digitSeparator: true
+                  }
+                },
+                {
+                  fieldName: "HORARIO_CICP",
+                  label: "Horario",
+                  format: {
+                    places: 0,
+                    digitSeparator: true
+                  }
+                },
+                {
+                  fieldName: "DIRECCION",
+                  label: "Dirección",
+                  format: {
+                    places: 0,
+                    digitSeparator: true
+                  }
+                },
+                {
+                  fieldName: "LOCALIDAD",
+                  label: "Localidad",
+                  format: {
+                    places: 0,
+                    digitSeparator: true
+                  }
+
+                },
+                {
+                  fieldName: "CUPOS",
+                  label: "Cupos",
+                  format: {
+                    places: 0,
+                    digitSeparator: true
+                  }
+
+                },
+
+                {
+                  fieldName: "TIPOLOGIA_CICP",
+                  label: "Tipología",
+                  format: {
+                    places: 0,
+                    digitSeparator: true
+                  }
+
+                }
+
+
+
+              ]
+            }
+          ]
+        };
+      }
+    });
+  </script>
+  <script async src='/cdn-cgi/bm/cv/669835187/api.js'></script>
+</head>
+
+<body>
+  <div id="viewDiv"></div>
+  <script
+    type="text/javascript">(function () { window['__CF$cv$params'] = { r: '6dca2dad7eaf3f15', m: 'XYJmGFHxdQRjPKh5XdJMoEFHV.RvCLLkYCUVQG2fvPs-1644714641-0-Ab89r3HO4WmVJqq/eQ7PpgfZMEZrV9sBnYGz+mHxLCsgNSIIF3dfPANs+JE1UB4RAgjRnDj1zxuIUsYHhq7qGv3iBSoADItgVcZddnK6AVB7PBhAB0E43V9iYwXPZZ91S/g38CUilXPpBTEW8FLptA+6snKQyAJTmwaxgmZoFpT3oVV3vulH54IebU3gQICr9PX1plhWhIHUfD/UfEZweOY=', s: [0x83fb634004, 0x477a9c808b], } })();</script>
+
+
+</html>
